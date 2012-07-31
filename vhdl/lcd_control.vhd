@@ -9,16 +9,11 @@
 -- Target Devices:
 -- Tool versions:
 -- Description: A module to print out stuff on the LCD. Modify to get your
--- 				 information on it. Currently it has two modes:
+-- 				 information on it. Currently it has only one mode:
 --                 0) [default]
 --							....,....,....,.
---					 		Firmware loaded
+--					 		Firmware loaded!
 --							online: ##:##:##
---
---                 1)
---							....,....,....,.
---                   [custom content]
--- 						[from software]
 --							
 --              This is based on a module I found somewhere. Unfortunately
 --              I can't remember where I found it.
