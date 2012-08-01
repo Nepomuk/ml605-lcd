@@ -45,7 +45,8 @@ end lcd_control;
 architecture lcd_control_arch of lcd_control is
 
 	-- the state machine for displaying information on the LCD
-	type state_type is ( waiting, init1,init2,init4,init5,init6,init7,init8, -- initialization
+	type state_type is ( waiting, init_reset1, init_reset2, -- power on
+								init_set_interface, init_display_off, init_display_clear, init_set_entry_mode, init_display_on, -- initialization
 								lcd_idle,
 								upper_line_pos, upper_line_char, lower_line_pos, lower_line_char,
 								donestate);
@@ -135,88 +136,77 @@ begin
 				sf_d_temp <= "00000000";
 				control <= "000"; 			-- clear
 				if 	(count >= wait_power_on) then
-						next_state <= init1;   state_flag <= '1';  
+						next_state <= init_reset1; state_flag <= '1';  
 				else	next_state <= waiting; state_flag <= '0';
 				end if;
 				
-			when init1 => 
+			when init_reset1 => 
 				sf_d_temp <= "00110000";	--reset
 				if 	(count = wait_after_data_exec_init) then
-						next_state <= init2;	control <= "001"; state_flag <= '1';
+						next_state <= init_reset2;	control <= "001"; state_flag <= '1';
 				elsif (count > wait_data_exec AND count <= wait_after_data_exec_init) then
-						next_state <= init1; control <= "000"; state_flag <= '0';  
-				else	next_state <= init1; control <= "001"; state_flag <= '0';
+						next_state <= init_reset1; control <= "000"; state_flag <= '0';  
+				else	next_state <= init_reset1; control <= "001"; state_flag <= '0';
 				end if;
 				
-			when init2 => 
+			when init_reset2 => 
 				sf_d_temp <= "00110000";	--reset	
 				if 	(count = wait_after_data_exec) then
-						next_state <= init4;	control <= "001"; state_flag <= '1';
+						next_state <= init_set_interface;	control <= "001"; state_flag <= '1';
 				elsif (count > wait_data_exec AND count <= wait_after_data_exec) then
-						next_state <= init2; control <= "000"; state_flag <= '0';  
-				else  next_state <= init2; control <= "001"; state_flag <= '0';
+						next_state <= init_reset2; control <= "000"; state_flag <= '0';  
+				else  next_state <= init_reset2; control <= "001"; state_flag <= '0';
 				end if;
-			
-			-- This init step was in the module I found but I can't find
-			-- a reason in the documentation, why this should be in. It
-			-- actually works without it.
---			when init3 =>
---				sf_d_temp <= "00110000";	 --reset
---				if 	(count = wait_after_data_exec_init) then
---						next_state <= init4;	control <= "001"; state_flag <= '1';
---				elsif (count > wait_data_exec AND count <= wait_after_data_exec_init) then
---						next_state <= init3; control <= "000"; state_flag <= '0';  
---				else	next_state <= init3; control <= "001"; state_flag <= '0';
---				end if;
 				
-			when init4 =>
+				
+			when init_set_interface =>
 				sf_d_temp <= "00101100";	-- set 4bit interface, 2 lines and 5*10 dots
 				control_base <= "000";
 				if 	(count = wait_after_data_exec) then
-						next_state <= init5; control <= "001"; state_flag <= '1';
+						next_state <= init_display_off; control <= "001"; state_flag <= '1';
 				elsif (count > wait_data_exec AND count <= wait_after_data_exec) then
-						next_state <= init4; control <= "000"; state_flag <= '0';  
-				else	next_state <= init4; control <= "001"; state_flag <= '0';
+						next_state <= init_set_interface; control <= "000"; state_flag <= '0';  
+				else	next_state <= init_set_interface; control <= "001"; state_flag <= '0';
 				end if;
 				
-			when init5 =>
+			when init_display_off =>
 				sf_d_temp <= "00001000"; 	-- display off
 				control_base <= "000";
 				if 	(count = wait_after_data_exec) then
-						next_state <= init6; control <= "001"; state_flag <= '1';
+						next_state <= init_display_clear; control <= "001"; state_flag <= '1';
 				elsif (count > wait_data_exec AND count <= wait_after_data_exec) then
-						next_state <= init5; control <= "000"; state_flag <= '0';  
-				else	next_state <= init5; control <= "001"; state_flag <= '0';
+						next_state <= init_display_off; control <= "000"; state_flag <= '0';  
+				else	next_state <= init_display_off; control <= "001"; state_flag <= '0';
 				end if;
 				
-			when init6 =>
+			when init_display_clear =>
 				sf_d_temp <= "00000001";	 -- clear display
 				control_base <= "000";		
 				if 	(count = wait_after_data_exec) then
-						next_state <= init7; control <= "001"; state_flag <= '1';
+						next_state <= init_set_entry_mode; control <= "001"; state_flag <= '1';
 				elsif (count > wait_data_exec AND count <= wait_after_data_exec) then
-						next_state <= init6; control <= "000"; state_flag <= '0';  
-				else	next_state <= init6; control <= "001"; state_flag <= '0';
+						next_state <= init_display_clear; control <= "000"; state_flag <= '0';  
+				else	next_state <= init_display_clear; control <= "001"; state_flag <= '0';
 				end if;
 				
-			when init7 =>
-				sf_d_temp <= "00000110";	 -- entry mode set ID=1, S=0
+			when init_set_entry_mode =>
+				sf_d_temp <= "00000110";	 -- set entry mode: cursor increase, display not shifted
 				control_base <= "000";
 				if 	(count = wait_after_data_exec) then
-						next_state <= init8; control <= "001"; state_flag <= '1';
+						next_state <= init_display_on; control <= "001"; state_flag <= '1';
 				elsif (count > wait_data_exec AND count <= wait_after_data_exec) then
-						next_state <= init7; control <= "000"; state_flag <= '0';  
-				else	next_state <= init7; control <= "001"; state_flag <= '0';
+						next_state <= init_set_entry_mode; control <= "000"; state_flag <= '0';  
+				else	next_state <= init_set_entry_mode; control <= "001"; state_flag <= '0';
 				end if;
 				
-			when init8 =>
+			when init_display_on =>
 				sf_d_temp <= "00001100";	 --Display: disp on, cursor off, blink off
 				control_base <= "000";
 				if 	(count = wait_after_data_exec) then
 						next_state <= lcd_idle; control <= "001"; state_flag <= '1';
 				elsif (count > wait_data_exec AND count <= wait_after_data_exec) then
-						next_state <= init8; control <= "000"; state_flag <= '0';  
-				else	next_state <= init8; control <= "001"; state_flag <= '0';
+						next_state <= init_display_on; control <= "000"; state_flag <= '0';  
+				else	next_state <= init_display_on; control <= "001"; state_flag <= '0';
 				end if;
 				
 ------------------------- Initialization Ends ------------------------------------
