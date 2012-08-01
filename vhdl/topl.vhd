@@ -43,7 +43,7 @@ entity topl is
 		SF_D                : out std_logic_vector(3 downto 0);	-- LCD data bus
 		LCD_E               : out std_logic;							-- LCD: E   (control bit)
 		LCD_RS              : out std_logic;							-- LCD: RS  (setup or data)
-		LCD_RW              : out std_logic							-- LCD: R/W (read or write)
+		LCD_RW              : out std_logic								-- LCD: R/W (read or write)
 		
 	);
 end topl;
@@ -59,10 +59,6 @@ architecture Behavioral of topl is
 			RST				: in		std_logic; 
 			CLK				: in		std_logic;
 			MODE				: in		std_logic_vector (2 downto 0);
---			FIFO_DIN			: in		std_logic_vector (31 downto 0);
---			FIFO_WE			: in		std_logic;
---			FIFO_START		: in		std_logic;
---			FIFO_BUSY		: out		std_logic;
 			CONTROL			: out		std_logic_vector (2 downto 0); -- LCD_RS, LCD_RW, LCD_E
 			SF_D				: out		std_logic_vector (7 downto 4)  -- LCD data bus
 		);
@@ -134,10 +130,6 @@ begin
 			RST			=> RESET,
 			CLK			=> clk_200,
 			MODE			=> "000",
---			FIFO_DIN		=> lcd_fifo_char,
---			FIFO_WE		=> lcd_fifo_we,
---			FIFO_START	=> creg(11),
---			FIFO_BUSY	=> lcd_fifo_busy,
 			CONTROL		=> LCD_CTRL,
 			SF_D			=> LCD_DB
 		);
