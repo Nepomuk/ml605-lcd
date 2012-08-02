@@ -55,6 +55,7 @@
 -- "Clock    Freq (MHz) (degrees) Cycle (%) Jitter (ps)  Error (ps)"
 ------------------------------------------------------------------------------
 -- CLK_OUT1___200.000______0.000______50.0_______98.146_____89.971
+-- CLK_OUT2____50.000______0.000______50.0______129.198_____89.971
 --
 ------------------------------------------------------------------------------
 -- "Input Clock   Freq (MHz)    Input Jitter (UI)"
@@ -71,6 +72,7 @@ port
   CLK_IN_N         : in     std_logic;
   -- Clock out ports
   CLK_OUT_200          : out    std_logic;
+  CLK_OUT_50          : out    std_logic;
   -- Status and control signals
   RESET             : in     std_logic;
   LOCKED            : out    std_logic
@@ -88,6 +90,7 @@ your_instance_name : clock_generator
     CLK_IN_N => CLK_IN_N,
     -- Clock out ports
     CLK_OUT_200 => CLK_OUT_200,
+    CLK_OUT_50 => CLK_OUT_50,
     -- Status and control signals
     RESET  => RESET,
     LOCKED => LOCKED);

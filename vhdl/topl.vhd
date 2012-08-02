@@ -72,8 +72,7 @@ architecture Behavioral of topl is
 			
 			-- Clock out ports
 			CLK_OUT_200   : out std_logic;
---			CLK_OUT_125   : out std_logic;
---			CLK_OUT_66    : out std_logic;
+			CLK_OUT_50    : out std_logic;
 			
 			-- Status and control signals
 			RESET         : in  std_logic;
@@ -88,8 +87,7 @@ architecture Behavioral of topl is
 
    -- clocks
 	signal clk_200            : std_logic;
---	signal clk_125            : std_logic;
---	signal clk_66             : std_logic;
+	signal clk_50            : std_logic;
 	signal clk_locked         : std_logic;
 	
 	-- LCD stuff
@@ -112,8 +110,7 @@ begin
 		
 		-- Clock out ports
 		CLK_OUT_200   => clk_200,
---		CLK_OUT_125   => clk_125,
---		CLK_OUT_66    => clk_66,
+		CLK_OUT_50    => clk_50,
 		
 		-- Status and control signals
 		RESET         => RESET,
@@ -128,7 +125,7 @@ begin
 	U_LCD : lcd_control
 		port map (
 			RST			=> RESET,
-			CLK			=> clk_200,
+			CLK			=> clk_50,
 			MODE			=> "000",
 			CONTROL		=> LCD_CTRL,
 			SF_D			=> LCD_DB

@@ -33,7 +33,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity lcd_control is 
    port ( 
        RST			: in std_logic;								-- Reset
-       CLK			: in std_logic;								-- Clock, 200 MHz (was 66 MHz)
+       CLK			: in std_logic;								-- Clock, 50 MHz
 		 MODE			: in std_logic_vector (2 downto 0);		-- in which mode should the LCD operate? (see comments above)
        CONTROL		: out std_logic_vector (2 downto 0); 	-- (2): LCD_RS, (1): LCD_RW, (0): LCD_E
        SF_D			: out std_logic_vector (7 downto 4)		-- LCD data bus
@@ -50,7 +50,8 @@ architecture lcd_control_arch of lcd_control is
 								lcd_idle,
 								upper_line_pos, upper_line_char, lower_line_pos, lower_line_char,
 								donestate);
-	signal state,next_state		: state_type;
+	signal state					: state_type := waiting;
+	signal next_state				: state_type := waiting;
 	signal state_flag				: std_logic := '0';
 	signal exit_idle_flag		: std_logic := '1';
 	
@@ -61,7 +62,7 @@ architecture lcd_control_arch of lcd_control is
 	signal sf_d_short				: std_logic_vector (7 downto 4) := "0000";
 	
 	-- count minutes and seconds
-	constant cycles_per_us     : integer := 200;
+	constant cycles_per_us     : integer := 50;
 	signal count, count_temp	: integer := 0;
 	signal second_counter		: integer range 0 to (cycles_per_us * 1000000) + 1 := 0;	-- 1s
 	signal seconds_ones			: integer range 0 to 9 := 0;
@@ -85,7 +86,7 @@ architecture lcd_control_arch of lcd_control is
 	constant wait_dual_2                : integer := 20 * cycles_per_us;    -- was 20us (1000 cycles);
 	constant wait_dual_3                : integer := 40 * cycles_per_us;    -- was 40us (2000 cycles);
 	constant wait_dual_4                : integer := 60 * cycles_per_us;    -- was 60us (3000 cycles);
-	constant wait_power_on              : integer := 15000 * cycles_per_us; -- was 15ms (750000 cycles);
+	constant wait_power_on              : integer := 16000 * cycles_per_us; -- was 15ms (750000 cycles);
 	constant wait_data_exec             : integer := 200 * cycles_per_us;   -- was 200us (10000 cycles);
 	constant wait_after_data_exec       : integer := 1000 * cycles_per_us;  -- was 4,2ms (210000 cycles);
 	constant wait_after_data_exec_init  : integer := 6000 * cycles_per_us; -- was 8,4ms (420000 cycles);
